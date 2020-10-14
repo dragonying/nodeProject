@@ -1,21 +1,21 @@
 // 获取接口api
 function getApi() {
     let keyword = 'bigEventApi';
-    let api = JSON.parse(localStorage.getItem(keyword)) || {};
+    let api = JSON.parse(sessionStorage.getItem(keyword)) || {};
     if (!api) {
         $.getJSON('/common/data/api.json', function (data) {
             api = data
-            localStorage.setItem(keyword, JSON.stringify(api));
+            sessionStorage.setItem(keyword, JSON.stringify(api));
         })
     }
     return api;
 }
 
 //token处理
-function token(v) {
+function token(v, del = false) {
     v = v || '';
     let k = 'token';
-    return v.length < 1 ? localStorage.getItem(k) : localStorage.setItem(k, v);
+    return del ? localStorage.removeItem(k) : (v.length < 1 ? localStorage.getItem(k) : localStorage.setItem(k, v));
 }
 
 
@@ -26,23 +26,19 @@ function frontRequest(targetType, data = {}, successFuc = null) {
 
 // 后台请求
 function backendRequest(targetType, data = {}, successFuc = null) {
-    // let token = token();
-
-    // if (token.length < 1) {
-    //     window.location.href = '/admin/login.html';
-    //     return;
-    // }
+    //用户token
+    let userToken = token();
     //全局ajax配置
     $.ajaxSetup({
         beforeSend: function (xhr) {
             //设置token
-            xhr.setRequestHeader('Authorization', token());
+            xhr.setRequestHeader('Authorization', userToken);
         },
         error: function (xhr, status, error) {
             console.log(error)
         },
         complete: function (xhr, status) {
-            if (token().length < 1) {
+            if (userToken.length < 1) {
                 window.location.href = '/admin/login.html';
             }
         }
@@ -70,10 +66,6 @@ function request(targetType, data = {}, successFuc = null) {
         type: target.method,
         data: data,
         success: function (res) {
-            if (res.code == 403) {
-                window.location.href = '/admin/login.html';
-                return;
-            }
             typeof successFuc == 'function' ? successFuc(res) : console.log(res);
         }
     }

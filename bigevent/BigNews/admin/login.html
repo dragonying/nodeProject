@@ -15,6 +15,7 @@
   <script src="./libs/jquery-1.12.4.min.js"></script>
   <!-- 引入bootstrap的js文件 -->
   <script src="./libs/bootstrap/js/bootstrap.min.js"></script>
+  <script src="/common/js/common.js"></script>
 </head>
 
 <body>
@@ -38,6 +39,50 @@
     </div>
   </div>
 
+  <div class="modal fade" tabindex="-1" role="dialog" id='alertMsg'>
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+              aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title">提示</h4>
+        </div>
+        <div class="modal-body">
+          <p></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-success" data-dismiss="modal">确定</button>
+        </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
 </body>
+<script>
+  $(function () {
+    function alertMsg(msg) {
+      $('#alertMsg .modal-body p').text(msg);
+      $('#alertMsg').modal();
+    }
+
+    $('input[type=submit]').click(function (e) {
+      e.preventDefault();
+      let account = $('input.input_txt').val().trim();
+      let password = $('input.input_pass').val().trim();
+      if (validHasValEmpty([account, password])) {
+        alertMsg('账号或密码不能为空！');
+        return;
+      }
+      backendRequest('adminUserLogin', { username: account, password: password }, function (res) {
+        if (res.code == 200) {
+          token(res.token);
+          window.location.href = '/admin/index.html'
+        } else {
+          alertMsg(res.msg);
+        }
+      });
+    });
+  })
+
+</script>
 
 </html>

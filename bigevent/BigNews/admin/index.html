@@ -40,15 +40,15 @@
                 </li>
             </ul>
 
-            <div class="level01"><a href="#" target="main_frame"><i
+            <div class="level01"><a href="comment_list.html" target="main_frame"><i
                         class="iconfont icon-comment"></i><span>评论管理</span></a></div>
-            <div class="level01" id="user"><a href="#" target="main_frame"><i
+            <div class="level01" id="user"><a href="user.html" target="main_frame"><i
                         class="iconfont icon-user"></i><span>个人中心</span></a></div>
         </div>
         <!-- 顶部栏 -->
         <div class="header_bar">
             <div class="user_center_link">
-                <a href="./user.html" target="main_frame">个人中心</a>
+                <a href="./user.html" target="main_frame" id='user-center'>个人中心</a>
                 <img src="images/2.jpg" alt="person">
                 <a href="javascript:void(0)" class="logout"><i class="iconfont icon-tuichu"></i> 退出</a>
             </div>
@@ -85,13 +85,21 @@
 
             if ($(this).next('ul').hasClass('level02')) {
                 $(this).next('ul').slideToggle().children('li').first().find('a').trigger('click');
+            } else {
+                //移出其他二级菜单选中状态
+                $('.level02>li').removeClass('active');
             }
+
+            $(this).find('b').toggleClass('rotate0')
         });
 
-        $('.level02>li>a').click(function (e) {
-            e.preventDefault();
+        $('.level02>li>a').click(function () {
             $(this).parent().addClass('active').siblings().removeClass('active');
             $('iframe[name=main_frame]').attr('src', $(this).attr('href'));
+        });
+
+        $('#user-center').click(function () {
+            $('#user.level01').click();
         });
 
         $('.logout').click(function () {

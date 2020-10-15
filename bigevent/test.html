@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="./BigNews/js/jquery-1.12.4.min.js"></script>
+    <style>
+        iframe {
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .active {
+            border: 2px solid red;
+            background-color: yellow;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- target 指定a打开方式 -->
+    <a href='https://shop.2dan88.com' target='myFrame'>商城</a>
+    <a href='https://www.baidu.com' target='myFrame'>百度</a>
+    <a id='my' href='https://www.taobao.com' target='myFrame'>淘宝</a>
+    <iframe src="https://shop.2dan88.com" frameborder="0" name='myFrame'></iframe>
+
+</body>
+<script>
+    $(function () {
+        document.getElementById('my').addEventListener('click', function () {
+            alert(333)
+        });
+        $('#my').click(function () {
+            $(this).addClass('active')
+        });
+        $('#my').on('click', function () {
+            console.log(5555)
+        });
+
+        //a 标签包含两个事件 1.默认事件 2.注册事件
+        //jq对象只能触发jq注册的事件
+        $('#my').click();
+        $('#my').trigger('click')
+        //dom对象可以触发所有事件
+        document.getElementById('my').click();
+        $('#my').get(0).click();
+    });
+</script>
+
+</html>

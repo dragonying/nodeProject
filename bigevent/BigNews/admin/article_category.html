@@ -14,6 +14,7 @@
     <script src="./libs/bootstrap/js/bootstrap.min.js"></script>
     <!-- 引入模板引擎js文件 -->
     <script src="./libs/template-web.js"></script>
+    <script src="/common/js/common.js"></script>
 </head>
 
 <body>
@@ -32,19 +33,14 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td>奇趣事</td>
-                        <td>funny</td>
-                        <td class="text-center">
-                            <a href="javascript:void(0);" data-toggle="modal" class=" btn btn-info btn-xs">编辑</a>
-                            <a href="javascript:void(0);" class="btn btn-danger btn-xs">删除</a>
-                        </td>
+                        <td colspan="3" align="center">暂无数据。。。。。。</td>
                     </tr>
                 </tbody>
                 <tfoot>
                     <tr>
                         <td colspan="3" class="text-center">
                             <a href="javascript:void(0)" class="btn btn-success" id="xinzengfenlei" data-toggle="modal"
-                                data-target="#myModal">新增分类</a>
+                                data-target="#form-modal" data-whatever="@add">新增分类</a>
                         </td>
                     </tr>
                 </tfoot>
@@ -52,4 +48,114 @@
         </div>
     </div>
 
+    <!-- 模态框 -->
+    <div class="modal fade" id="form-modal" tabindex="-1" role="dialog" aria-labelledby="form-modalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="form-modalLabel">新增分类</h4>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label for="recipient-name" class="control-label">名称:</label>
+                            <input type="text" class="form-control" name='name'>
+                        </div>
+                        <div class="form-group">
+                            <label for="message-text" class="control-label">Slug:</label>
+                            <input type="text" class="form-control" name='slug'>
+                        </div>
+                        <input type='hidden' name='id' value=''>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary btn-sumbit">确认</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" tabindex="-1" role="dialog" id='confirm-modal'>
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">提示</h4>
+                </div>
+                <div class="modal-body">
+                    <p>是否确认删除</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-danger del-btn">删除</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div>
+
+</body>
+<script id='categoryList' type='text/html'>
+    {{each}}
+    <tr>
+        <td>{{$value.name}}</td>
+        <td>{{$value.slug}}</td>
+        <td class="text-center">
+            <a href="javascript:void(0);" data-id="{{$value.id}}" data-toggle="modal" data-target="#form-modal" data-whatever="@edit" class=" btn btn-info btn-xs">编辑</a>
+            <a href="javascript:void(0);"  data-id="{{$value.id}}" data-toggle="modal" data-target="#confirm-modal" class="btn btn-danger btn-xs">删除</a>
+        </td>
+    </tr>
+    {{/each}}
+</script>
+
+<script>
+    $(function () {
+        //获取列表
+        backendRequest('adminCategoryList', function (res) {
+            $('.category_table tbody').html(template('categoryList', res.data));
+        });
+
+        //触发模态框
+        $('#form-modal').on('show.bs.modal', function (e) {
+            $(this).find('form').get(0).reset();//重置表单
+            $(this).find('input[name=id]').val('');
+            let clickObj = $(e.relatedTarget);
+            if (clickObj.data('whatever') == '@edit') {//编辑
+                $(this).find('input[name=id]').val(clickObj.data('id'));
+                $('#form-modalLabel').text('编辑分类');
+                $(this).find('input[name=name]').val(clickObj.parent().prev().prev().text());
+                $(this).find('input[name=slug]').val(clickObj.parent().prev().text());
+
+            } else {//新增
+                $('#form-modalLabel').text('新增分类');
+            }
+        });
+
+        //确认
+        $('#form-modal button.btn-sumbit').click(function () {
+            let target = $('input[name=id]').val().length < 1 ? 'adminCategoryAdd' : 'adminCategoryEdit';
+            backendRequest(target, $('#form-modal input').serialize(), function (res) {
+                window.location.reload();
+            });
+        });
+
+
+        //删除
+        $('#confirm-modal').on('show.bs.modal', function (e) {
+            $(this).find('.del-btn').data('id', $(e.relatedTarget).data('id'));
+        })
+        $('#confirm-modal .del-btn').click(function () {
+            let id = $(this).data('id');
+            backendRequest('adminCategoryDelete', { id: id }, function (res) {
+                window.location.reload();
+            });
+        });
+
+
+    });
+</script>
 </html>
